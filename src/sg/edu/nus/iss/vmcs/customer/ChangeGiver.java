@@ -13,6 +13,7 @@ import sg.edu.nus.iss.vmcs.store.Store;
 import sg.edu.nus.iss.vmcs.store.StoreController;
 import sg.edu.nus.iss.vmcs.store.StoreItem;
 import sg.edu.nus.iss.vmcs.system.MainController;
+import sg.edu.nus.iss.vmcs.system.Observer;
 import sg.edu.nus.iss.vmcs.util.VMCSException;
 
 /**
@@ -20,7 +21,7 @@ import sg.edu.nus.iss.vmcs.util.VMCSException;
  * @author Team SE16T5E
  * @version 1.0 2008-10-01
  */
-public class ChangeGiver {
+public class ChangeGiver implements Observer{
 	private TransactionController txCtrl; 
 
 	/**
@@ -29,6 +30,21 @@ public class ChangeGiver {
 	 */
 	public ChangeGiver(TransactionController txCtrl){
 		this.txCtrl=txCtrl;
+	}
+	
+	/**
+	 * Observer method called on observable update
+	 * @param eventType type of event occured
+	 */
+	@Override
+	public void update(int eventType) {
+		// TODO Auto-generated method stub
+		if(eventType == TransactionController.EVENT_TRANSACTION_DISPLAY) {
+			displayChangeStatus();
+		} else if(eventType == TransactionController.EVENT_TRANSACTION_START) {
+			resetChange();
+			displayChangeStatus();
+		}
 	}
 	
 	/**

@@ -13,6 +13,7 @@ import sg.edu.nus.iss.vmcs.store.StoreController;
 import sg.edu.nus.iss.vmcs.store.StoreItem;
 import sg.edu.nus.iss.vmcs.store.StoreObject;
 import sg.edu.nus.iss.vmcs.system.MainController;
+import sg.edu.nus.iss.vmcs.system.Observer;
 import sg.edu.nus.iss.vmcs.util.VMCSException;
 
 /**
@@ -20,7 +21,7 @@ import sg.edu.nus.iss.vmcs.util.VMCSException;
  * @author Team SE16T5E
  * @version 1.0 2008-10-01
  */
-public class DispenseController {
+public class DispenseController implements Observer{
     private TransactionController txCtrl;
     private int selection=0;
 	
@@ -31,6 +32,31 @@ public class DispenseController {
     public DispenseController(TransactionController txCtrl){
     	this.txCtrl=txCtrl;
     }
+    
+    /**
+	 * Observer method called on observable update
+	 * @param eventType type of event occured
+	 */
+	@Override
+	public void update(int eventType) {
+		// TODO Auto-generated method stub
+		if(eventType == TransactionController.EVENT_TRANSACTION_DISPLAY) {
+			updateDrinkPanel();
+			allowSelection(true);
+		} else if(eventType == TransactionController.EVENT_TRANSACTION_START) {
+			ResetCan();
+			allowSelection(false);
+		}  else if(eventType == TransactionController.EVENT_TRANSACTION_END) {
+			dispenseDrink();
+			allowSelection(true);
+		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE_FAULT) {
+			allowSelection(false);
+		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE) {
+			allowSelection(false);
+		}  else if(eventType == TransactionController.EVENT_TRANSACTION_CANCEL) {
+			allowSelection(true);
+		} 
+	}
     
     /**
      * This method updates the whole Drink Selection Box with current names, stocks and prices.
@@ -105,8 +131,9 @@ public class DispenseController {
 	 * Transaction Controller&#46;
 	 * @param selectedBrand the selected brand&#46;
 	 */
-	public boolean dispenseDrink(int selectedBrand){
+	public boolean dispenseDrink(){
 		try{
+			int selectedBrand = txCtrl.getSelection();
 			txCtrl.getMainController().getMachineryController().dispenseDrink(selectedBrand);
 			MainController mainCtrl=txCtrl.getMainController();
 			StoreController storeCtrl=mainCtrl.getStoreController();

@@ -16,11 +16,16 @@ package sg.edu.nus.iss.vmcs.customer;
  */
 
 import java.awt.Frame;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import sg.edu.nus.iss.vmcs.store.DrinksBrand;
 import sg.edu.nus.iss.vmcs.store.Store;
 import sg.edu.nus.iss.vmcs.store.StoreItem;
 import sg.edu.nus.iss.vmcs.system.MainController;
+import sg.edu.nus.iss.vmcs.system.Observable;
+import sg.edu.nus.iss.vmcs.system.Observer;
 import sg.edu.nus.iss.vmcs.system.SimulatorControlPanel;
 
 /**
@@ -29,13 +34,24 @@ import sg.edu.nus.iss.vmcs.system.SimulatorControlPanel;
  * @author Team SE16T5E
  * @version 1.0 2008-10-01
  */
-public class TransactionController {
+public class TransactionController implements Observable{
+	
+	public static final int EVENT_TRANSACTION_START = 0;
+	public static final int EVENT_TRANSACTION_CONTINUE = 1;
+	public static final int EVENT_TRANSACTION_END = 2;
+	public static final int EVENT_TRANSACTION_DISPLAY = 3;
+	public static final int EVENT_TRANSACTION_TERMINATE_FAULT = 4;
+	public static final int EVENT_TRANSACTION_TERMINATE = 5;
+	public static final int EVENT_TRANSACTION_CANCEL = 6;
+	
 	private MainController mainCtrl;
 	private CustomerPanel custPanel;
 	private DispenseController dispenseCtrl;
 	private ChangeGiver changeGiver;
 	private CoinReceiver coinReceiver;
-
+	private List<Observer> mObservers;
+	private int state=-1;
+	
 	/**Set to TRUE when change is successfully issued during the transaction.*/
 	private boolean changeGiven=false;
 	/**Set to TRUE when the drink is successfully dispensed during the transaction.*/
@@ -54,6 +70,42 @@ public class TransactionController {
 		dispenseCtrl=new DispenseController(this);
 		coinReceiver=new CoinReceiver(this);
 		changeGiver=new ChangeGiver(this);
+		addObservers();
+	}
+	
+	@Override
+	public void addObserver(Observer o) {
+		// TODO Auto-generated method stub
+		if(mObservers == null)
+			mObservers = new ArrayList<>();
+		mObservers.add(o);
+	}
+
+
+
+	@Override
+	public void removeObserver(Observer o) {
+		// TODO Auto-generated method stub
+		if(mObservers != null) {
+			Iterator<Observer> obsIterator = mObservers.iterator();
+			while(obsIterator.hasNext()) {
+				if(o.equals(obsIterator.next())) {
+					mObservers.remove(o);
+					break;
+				}
+			}
+		}
+	}
+
+	@Override
+	public void notify(int eventType) {
+		// TODO Auto-generated method stub
+		if(mObservers != null) {
+			Iterator<Observer> obsIterator = mObservers.iterator();
+			while(obsIterator.hasNext()) {
+				obsIterator.next().update(eventType);
+			}
+		}
 	}
 
 	/**
@@ -71,10 +123,8 @@ public class TransactionController {
 		SimulatorControlPanel scp = mainCtrl.getSimulatorControlPanel();
 	    custPanel = new CustomerPanel((Frame) scp, this);
 		custPanel.display();
-		dispenseCtrl.updateDrinkPanel();
-		dispenseCtrl.allowSelection(true);
-		changeGiver.displayChangeStatus();
-		coinReceiver.setActive(false);
+		state = EVENT_TRANSACTION_DISPLAY;
+		notify(state);
 	}
 	
 	/**
@@ -99,11 +149,8 @@ public class TransactionController {
 		StoreItem storeItem=mainCtrl.getStoreController().getStoreItem(Store.DRINK,drinkIdentifier);
 		DrinksBrand drinksBrand=(DrinksBrand)storeItem.getContent();
 		setPrice(drinksBrand.getPrice());
-		changeGiver.resetChange();
-		dispenseCtrl.ResetCan();
-		changeGiver.displayChangeStatus();
-		dispenseCtrl.allowSelection(false);
-		coinReceiver.startReceiver();
+		state = EVENT_TRANSACTION_START;
+		notify(state);
 		custPanel.setTerminateButtonActive(true);
 	}
 	
@@ -124,7 +171,8 @@ public class TransactionController {
 		if(total>=price)
 			completeTransaction();
 		else{
-			coinReceiver.continueReceive();
+			state = EVENT_TRANSACTION_CONTINUE;
+			notify(state);
 		}
 	}
 	
@@ -143,7 +191,7 @@ public class TransactionController {
 	 */
 	public void completeTransaction(){
 		System.out.println("CompleteTransaction: Begin");
-		dispenseCtrl.dispenseDrink(selection);
+		state = EVENT_TRANSACTION_END;
 		int totalMoneyInserted=coinReceiver.getTotalInserted();
 		int change=totalMoneyInserted-price;
 		if(change>0){
@@ -152,9 +200,7 @@ public class TransactionController {
 		else{
 			getCustomerPanel().setChange(0);
 		}
-		coinReceiver.storeCash();
-		dispenseCtrl.allowSelection(true);
-		
+		notify(state);		
 		refreshMachineryDisplay();
 		System.out.println("CompleteTransaction: End");
 	}
@@ -167,8 +213,8 @@ public class TransactionController {
 	 */
 	public void terminateFault(){
 		System.out.println("TerminateFault: Begin");
-		dispenseCtrl.allowSelection(false);
-		coinReceiver.refundCash();
+		state = EVENT_TRANSACTION_TERMINATE_FAULT;
+		notify(state);
 		refreshMachineryDisplay();
 		System.out.println("TerminateFault: End");
 	}
@@ -187,9 +233,8 @@ public class TransactionController {
 	 */
 	public void terminateTransaction(){
 		System.out.println("TerminateTransaction: Begin");
-		dispenseCtrl.allowSelection(false);
-		coinReceiver.stopReceive();
-		coinReceiver.refundCash();
+		state = EVENT_TRANSACTION_TERMINATE;
+		notify(state);
 		if(custPanel!=null){
 			custPanel.setTerminateButtonActive(false);
 		}
@@ -202,9 +247,8 @@ public class TransactionController {
 	 */
 	public void cancelTransaction(){
 		System.out.println("CancelTransaction: Begin");
-		coinReceiver.stopReceive();
-		coinReceiver.refundCash();
-		dispenseCtrl.allowSelection(true);
+		state = EVENT_TRANSACTION_CANCEL;
+		notify(state);
 		refreshMachineryDisplay();
 		System.out.println("CancelTransaction: End");
 	}
@@ -342,5 +386,11 @@ public class TransactionController {
 	 */
 	public void nullifyCustomerPanel(){
 		custPanel=null;
+	}
+	
+	private void addObservers() {
+		addObserver(dispenseCtrl);
+		addObserver(coinReceiver);
+		addObserver(changeGiver);
 	}
 }//End of class TransactionController

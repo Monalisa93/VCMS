@@ -13,6 +13,7 @@ import sg.edu.nus.iss.vmcs.machinery.MachineryController;
 import sg.edu.nus.iss.vmcs.store.CashStore;
 import sg.edu.nus.iss.vmcs.store.Coin;
 import sg.edu.nus.iss.vmcs.store.Store;
+import sg.edu.nus.iss.vmcs.system.Observer;
 import sg.edu.nus.iss.vmcs.util.VMCSException;
 
 /**
@@ -20,7 +21,7 @@ import sg.edu.nus.iss.vmcs.util.VMCSException;
  * @author Team SE16T5E
  * @version 1.0 2008-10-01
  */
-public class CoinReceiver {
+public class CoinReceiver implements Observer{
 	private TransactionController txCtrl;
 	
 	/**List of the Coins entered during the transaction.*/
@@ -36,6 +37,32 @@ public class CoinReceiver {
 		this.txCtrl=txCtrl;
 		arlCoins=new ArrayList();
 		setTotalInserted(0);
+	}
+	
+	/**
+	 * Observer method called on observable update
+	 * @param eventType type of event occured.
+	 */
+	@Override
+	public void update(int eventType) {
+		// TODO Auto-generated method stub
+		if(eventType == TransactionController.EVENT_TRANSACTION_DISPLAY) {
+			setActive(false);
+		} else if(eventType == TransactionController.EVENT_TRANSACTION_START) {
+			startReceiver();
+		} else if(eventType ==TransactionController.EVENT_TRANSACTION_CONTINUE) {
+			continueReceive();
+		} else if(eventType == TransactionController.EVENT_TRANSACTION_END) {
+			storeCash();
+		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE_FAULT) {
+			refundCash();
+		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE) {
+			stopReceive();
+			refundCash();
+		}   else if(eventType == TransactionController.EVENT_TRANSACTION_CANCEL) {
+			stopReceive();
+			refundCash();
+		} 
 	}
 	
 	/**
