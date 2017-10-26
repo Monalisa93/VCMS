@@ -9,6 +9,12 @@ package sg.edu.nus.iss.vmcs.store;
 
 import java.io.IOException;
 
+import sg.edu.nus.iss.vmcs.system.DBPersistanceApiInterfaceImpl;
+import sg.edu.nus.iss.vmcs.system.FilePersistanceApiInterfaceImpl;
+import sg.edu.nus.iss.vmcs.system.FilePropertyLoader;
+import sg.edu.nus.iss.vmcs.system.PersistanceMappingInterface;
+import sg.edu.nus.iss.vmcs.system.PersistanceMappingInterfaceImpl;
+
 /**
  * This control object manages changes in CashStore attributes and 
  * the DrinksStore attributes.
@@ -32,6 +38,9 @@ public class StoreController {
 
 	private PropertyLoader cashLoader;
 	private PropertyLoader drinksLoader;
+	private PersistanceMappingInterface dBpersitanceMappingInterface;
+	private PersistanceMappingInterface cashFilepersitanceMappingInterface;
+	private PersistanceMappingInterface drinksFilepersitanceMappingInterface;
 
 	/**
 	 * This constructor creates an instance of StoreController object.
@@ -52,6 +61,11 @@ public class StoreController {
 	public void initialize() throws IOException {
 		cStore = new CashStore();
 		dStore = new DrinksStore();
+		dBpersitanceMappingInterface = new PersistanceMappingInterfaceImpl(new DBPersistanceApiInterfaceImpl());
+		cashFilepersitanceMappingInterface = new PersistanceMappingInterfaceImpl(
+				new FilePersistanceApiInterfaceImpl(((FilePropertyLoader)cashLoader)));
+		drinksFilepersitanceMappingInterface = new PersistanceMappingInterfaceImpl(
+				new FilePersistanceApiInterfaceImpl(((FilePropertyLoader)drinksLoader)));
 		initializeStores();
 	}
 
@@ -253,7 +267,9 @@ public class StoreController {
 		for (int i = 0; i < size; i++) {
 			cashLoader.setItem(i, cStore.getStoreItem(i));
 		}
-		cashLoader.saveProperty();
+		//cashLoader.saveProperty();
+		cashFilepersitanceMappingInterface.save(null);
+		dBpersitanceMappingInterface.save(null);
 	}
 
 	/**
@@ -267,7 +283,9 @@ public class StoreController {
 		for (int i = 0; i < size; i++) {
 			drinksLoader.setItem(i, dStore.getStoreItem(i));
 		}
-		drinksLoader.saveProperty();
+		//drinksLoader.saveProperty();
+		drinksFilepersitanceMappingInterface.save(null);
+		dBpersitanceMappingInterface.save(null);
 	}
 
 	/**

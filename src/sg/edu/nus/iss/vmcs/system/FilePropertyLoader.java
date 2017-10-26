@@ -62,6 +62,16 @@ public abstract class FilePropertyLoader implements PropertyLoader {
 		prop.store(stream, "");
 		stream.close();
 	}
+	
+	/**
+	 * This method writes the properties from the hash table to the file.
+	 * @throws IOException if fail to store properties to properties file.
+	 */
+	public void saveProperty(Properties properties) throws IOException {
+		FileOutputStream stream = new FileOutputStream(fileName);
+		properties.store(stream, "");
+		stream.close();
+	}
 
 	/**
 	 * This method returns the number of items (either CashStoreItem or DrinkStoreItem)
@@ -114,4 +124,5 @@ public abstract class FilePropertyLoader implements PropertyLoader {
 	public void setValue(String key, String value) {
 		prop.setProperty(key, value);
 	}
+
 }//End of class FilePropertyLoader
