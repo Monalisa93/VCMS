@@ -7,5 +7,4 @@ public interface Observable {
 	public void removeObserver(Observer o);
 	
 	public void notify(int eventType);
-
 }

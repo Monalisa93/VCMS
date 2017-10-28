@@ -90,7 +90,7 @@ public class StoreController {
 		dStore.setStoreSize(numOfItems);
 
 		for (int i = 0; i < numOfItems; i++) {
-            DrinksStoreItem item = (DrinksStoreItem) drinksLoader.getItem(i);
+            DrinksStoreItem item = (DrinksStoreItem) drinksFilepersitanceMappingInterface.fetch(i);
 			StoreObject brand = item.getContent();
 			StoreObject existingBrand = dStore.findObject(brand.getName());
 			if (existingBrand != null) {
@@ -111,7 +111,7 @@ public class StoreController {
 		cStore.setStoreSize(numOfItems);
 
 		for (int i = 0; i < numOfItems; i++) {
-		    CashStoreItem item = (CashStoreItem) cashLoader.getItem(i);
+		    CashStoreItem item = (CashStoreItem) cashFilepersitanceMappingInterface.fetch(i);
 			cStore.addItem(i, item);
 		}
 	}
@@ -265,7 +265,9 @@ public class StoreController {
 		int size = cStore.getStoreSize();
 		cashLoader.setNumOfItems(size);
 		for (int i = 0; i < size; i++) {
-			cashLoader.setItem(i, cStore.getStoreItem(i));
+			//cashLoader.setItem(i, cStore.getStoreItem(i));
+			cashFilepersitanceMappingInterface.set(i, cStore.getStoreItem(i));
+			dBpersitanceMappingInterface.set(i, cStore.getStoreItem(i));
 		}
 		//cashLoader.saveProperty();
 		cashFilepersitanceMappingInterface.save(null);
@@ -281,7 +283,9 @@ public class StoreController {
 		int size = dStore.getStoreSize();
 		drinksLoader.setNumOfItems(size);
 		for (int i = 0; i < size; i++) {
-			drinksLoader.setItem(i, dStore.getStoreItem(i));
+//			drinksLoader.setItem(i, dStore.getStoreItem(i));
+			drinksFilepersitanceMappingInterface.set(i, dStore.getStoreItem(i));
+			dBpersitanceMappingInterface.set(i, dStore.getStoreItem(i));
 		}
 		//drinksLoader.saveProperty();
 		drinksFilepersitanceMappingInterface.save(null);

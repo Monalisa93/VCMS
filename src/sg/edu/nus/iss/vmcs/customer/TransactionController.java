@@ -192,14 +192,6 @@ public class TransactionController implements Observable{
 	public void completeTransaction(){
 		System.out.println("CompleteTransaction: Begin");
 		state = EVENT_TRANSACTION_END;
-		int totalMoneyInserted=coinReceiver.getTotalInserted();
-		int change=totalMoneyInserted-price;
-		if(change>0){
-			changeGiver.giveChange(change);
-		}
-		else{
-			getCustomerPanel().setChange(0);
-		}
 		notify(state);		
 		refreshMachineryDisplay();
 		System.out.println("CompleteTransaction: End");
