@@ -79,6 +79,7 @@ public class TransactionController implements Observable{
 		if(mObservers == null)
 			mObservers = new ArrayList<>();
 		mObservers.add(o);
+		System.out.println("Observer is added");
 	}
 
 
@@ -192,6 +193,7 @@ public class TransactionController implements Observable{
 	public void completeTransaction(){
 		System.out.println("CompleteTransaction: Begin");
 		state = EVENT_TRANSACTION_END;
+		System.out.println("Event is passed on state change");
 		int totalMoneyInserted=coinReceiver.getTotalInserted();
 		int change=totalMoneyInserted-price;
 		if(change>0){
