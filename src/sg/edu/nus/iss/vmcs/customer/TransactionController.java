@@ -51,6 +51,7 @@ public class TransactionController implements Observable{
 	private CoinReceiver coinReceiver;
 	private List<Observer> mObservers;
 	private int state=-1;
+	private int change = 0;
 	
 	/**Set to TRUE when change is successfully issued during the transaction.*/
 	private boolean changeGiven=false;
@@ -145,6 +146,7 @@ public class TransactionController implements Observable{
 	 * @param drinkIdentifier the drink brand item identifier.
 	 */
 	public void startTransaction(int drinkIdentifier){
+		change = 0;
 		setSelection(drinkIdentifier);
 		StoreItem storeItem=mainCtrl.getStoreController().getStoreItem(Store.DRINK,drinkIdentifier);
 		DrinksBrand drinksBrand=(DrinksBrand)storeItem.getContent();
@@ -380,6 +382,16 @@ public class TransactionController implements Observable{
 		custPanel=null;
 	}
 	
+	
+	
+	public int getChange() {
+		return change;
+	}
+
+	public void setChange(int change) {
+		this.change = change;
+	}
+
 	private void addObservers() {
 		addObserver(dispenseCtrl);
 		addObserver(coinReceiver);

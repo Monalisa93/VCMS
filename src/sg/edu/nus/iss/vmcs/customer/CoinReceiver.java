@@ -54,13 +54,7 @@ public class CoinReceiver implements Observer{
 			continueReceive();
 		} else if(eventType == TransactionController.EVENT_TRANSACTION_END) {
 			int totalMoneyInserted=getTotalInserted();
-			int change=totalMoneyInserted-txCtrl.getPrice();
-			if(change>0){
-				txCtrl.getChangeGiver().giveChange(change);
-			}
-			else{
-				txCtrl.getCustomerPanel().setChange(0);
-			}
+			txCtrl.setChange(totalMoneyInserted-txCtrl.getPrice());
 			storeCash();
 		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE_FAULT) {
 			refundCash();

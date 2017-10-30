@@ -44,6 +44,14 @@ public class ChangeGiver implements Observer{
 		} else if(eventType == TransactionController.EVENT_TRANSACTION_START) {
 			resetChange();
 			displayChangeStatus();
+		} else if(eventType == TransactionController.EVENT_TRANSACTION_END) {
+			int change = txCtrl.getChange();
+			if(change>0){
+				giveChange(change);
+			}
+			else{
+				txCtrl.getCustomerPanel().setChange(0);
+			}
 		}
 	}
 	
