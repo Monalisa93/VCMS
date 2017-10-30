@@ -47,21 +47,28 @@ public class CoinReceiver implements Observer{
 	public void update(int eventType) {
 		// TODO Auto-generated method stub
 		if(eventType == TransactionController.EVENT_TRANSACTION_DISPLAY) {
+			System.out.println("Observer: CoinReciever: EVENT_TRANSACTION_DISPLAY");
 			setActive(false);
 		} else if(eventType == TransactionController.EVENT_TRANSACTION_START) {
+			System.out.println("Observer: CoinReciever: EVENT_TRANSACTION_START");
 			startReceiver();
 		} else if(eventType ==TransactionController.EVENT_TRANSACTION_CONTINUE) {
+			System.out.println("Observer: CoinReciever: EVENT_TRANSACTION_CONTINUE");
 			continueReceive();
 		} else if(eventType == TransactionController.EVENT_TRANSACTION_END) {
+			System.out.println("Observer: CoinReciever: EVENT_TRANSACTION_END");
 			int totalMoneyInserted=getTotalInserted();
 			txCtrl.setChange(totalMoneyInserted-txCtrl.getPrice());
 			storeCash();
 		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE_FAULT) {
+			System.out.println("Observer: CoinReciever: EVENT_TRANSACTION_TERMINATE_FAULT");
 			refundCash();
 		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE) {
+			System.out.println("Observer: CoinReciever: EVENT_TRANSACTION_TERMINATE");
 			stopReceive();
 			refundCash();
 		}   else if(eventType == TransactionController.EVENT_TRANSACTION_CANCEL) {
+			System.out.println("Observer: CoinReciever: EVENT_TRANSACTION_CANCEL");
 			stopReceive();
 			refundCash();
 		} 

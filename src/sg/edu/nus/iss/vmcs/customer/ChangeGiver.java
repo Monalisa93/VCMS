@@ -40,11 +40,14 @@ public class ChangeGiver implements Observer{
 	public void update(int eventType) {
 		// TODO Auto-generated method stub
 		if(eventType == TransactionController.EVENT_TRANSACTION_DISPLAY) {
+			System.out.println("Observer: ChangeGiver: EVENT_TRANSACTION_DISPLAY");
 			displayChangeStatus();
 		} else if(eventType == TransactionController.EVENT_TRANSACTION_START) {
+			System.out.println("Observer: ChangeGiver: EVENT_TRANSACTION_START");
 			resetChange();
 			displayChangeStatus();
 		} else if(eventType == TransactionController.EVENT_TRANSACTION_END) {
+			System.out.println("Observer: ChangeGiver: EVENT_TRANSACTION_END");
 			int change = txCtrl.getChange();
 			if(change>0){
 				giveChange(change);

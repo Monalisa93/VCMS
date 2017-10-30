@@ -41,19 +41,25 @@ public class DispenseController implements Observer{
 	public void update(int eventType) {
 		// TODO Auto-generated method stub
 		if(eventType == TransactionController.EVENT_TRANSACTION_DISPLAY) {
+			System.out.println("Observer: DispenseController: EVENT_TRANSACTION_DISPLAY");
 			updateDrinkPanel();
 			allowSelection(true);
 		} else if(eventType == TransactionController.EVENT_TRANSACTION_START) {
+			System.out.println("Observer: DispenseController: EVENT_TRANSACTION_START");
 			ResetCan();
 			allowSelection(false);
 		}  else if(eventType == TransactionController.EVENT_TRANSACTION_END) {
+			System.out.println("Observer: DispenseController: EVENT_TRANSACTION_END");
 			dispenseDrink();
 			allowSelection(true);
 		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE_FAULT) {
+			System.out.println("Observer: DispenseController: EVENT_TRANSACTION_TERMINATE_FAULT");
 			allowSelection(false);
 		}  else if(eventType == TransactionController.EVENT_TRANSACTION_TERMINATE) {
+			System.out.println("Observer: DispenseController: EVENT_TRANSACTION_TERMINATE");
 			allowSelection(false);
 		}  else if(eventType == TransactionController.EVENT_TRANSACTION_CANCEL) {
+			System.out.println("Observer: DispenseController: EVENT_TRANSACTION_CANCEL");
 			allowSelection(true);
 		} 
 	}
